@@ -164,6 +164,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         // 画面の更新（必須）
         ScreenFlip();
-        clsDx();
+        clsDx(); // デバッグログ画面をクリアする処理
     }
+
+    DxLib_End(); // DX Libraryの使用を終了する処理
+    return 0;    // ソフトを正常終了
 }
