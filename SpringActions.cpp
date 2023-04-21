@@ -1,4 +1,3 @@
-#include <math.h>
 #include "DxLib.h"
 
 // プログラムの最初はWinMainで始める
