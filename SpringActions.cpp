@@ -1,118 +1,117 @@
 #include <math.h>
 #include "DxLib.h"
-#define _OX_EPSILON_ 0.000001f // �덷
 
-// �v���O�����̍ŏ���WinMain�Ŏn�߂�
+// プログラムの最初はWinMainで始める
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    //##### �����ݒ� #####//
-    // �E�B���h�E���[�h�ݒ�
+    //##### 初期設定 #####//
+    // ウィンドウモード設定
     ChangeWindowMode(TRUE);
 
-    // ��ʃT�C�Y�ݒ�
+    // 画面サイズ設定
     int width = 1920;
     int height = 1080;
     SetGraphMode(width, height, 32);
 
-    // DX���C�u��������������
+    // DXライブラリ初期化処理
     if (DxLib_Init() == -1) {
-        return -1; // �G���[���N�����璼���ɏI��
+        return -1; // エラーが起きたら直ちに終了
     }
 
 
 
-    //## ���ɉ����Đݒ�
-    // �ړ����̂̔��T�C�Y
+    //## 環境に応じて設定
+    // 移動物体の箱サイズ
     int size = 60;
 
-    // �����l
-    // ���t���̃t���[�����[�g�ɂ���ĕω����邱�Ƃ��킩���Ă��邽��
-    // ��������������ꍇ�₨��������ꍇ�͂��̐��l�𒲐����邱�ƁB
+    // 減衰値
+    // ※液晶のフレームレートによって変化することがわかっているため
+    // 動きが早すぎる場合やおそすぎる場合はこの数値を調整すること。
     float decay = 0.97;
 
-    // �L�[���͎��̈ړ����x
+    // キー入力時の移動速度
     int moveSpeed = 15;
 
-    // ���@���l
-    // ���t���̃t���[�����[�g�ɂ���ĕω����邱�Ƃ��킩���Ă��邽��
-    // ��������������ꍇ�₨��������ꍇ�͂��̐��l�𒲐����邱�ƁB
+    // 除法数値
+    // ※液晶のフレームレートによって変化することがわかっているため
+    // 動きが早すぎる場合やおそすぎる場合はこの数値を調整すること。
     float divisor = 0.25;
 
 
 
-    //## �ŗL�̐ݒ�
-    // ���̃T�C�Y�̔������v�Z
+    //## 固有の設定
+    // 箱のサイズの半分を計算
     int sizeCenter = size / 2;
 
-    // �F�̐ݒ�
+    // 色の設定
     unsigned int mainColor = GetColor(0, 0, 255);
     unsigned int subColor = GetColor(255, 0, 0);
 
-    // �ړ����̏������W�ݒ�
+    // 移動物体初期座標設定
     int x = width / 2;
     int y = height / 2;
 
-    // �������̏������W�ݒ�
+    // 中央物体初期座標設定
     int centerX = width / 2;
     int centerY = height / 2;
 
-    // �}�E�X���W�擾
+    // マウス座標取得
     int mouseX = 0;
     int mouseY = 0;
 
-    // �^���x�N�^�n���i�[
+    // 運動ベクタ系統格納
     int RelativeX = 0;
     int RelativeY = 0;
     float MotionX = 0;
     float MotionY = 0;
 
-    // �����蔻��������I�u�W�F�N�g�̊i�[
+    // 当たり判定をつけたオブジェクトの格納
     bool obj = false;
     int objX = 100;
     int objY = 400;
 
     
 
-    // ���C�����[�v�i�`�揈���j
+    // メインループ（描画処理）
     while (ProcessMessage() == 0) {
-        // ��ʂ̍X�V
+        // 画面の更新
         ClearDrawScreen();
 
 
 
-        //##### �������� �ړ����̂̏���
-        // ���S�Ƃ̑��΃x�N�^�[�̎擾
+        //##### ここから 移動物体の処理
+        // 中心との相対ベクターの取得
         RelativeX = centerX - x;
         RelativeY = centerY - y;
 
-        // �����������^���x�N�^�ɗݐω��Z
+        // 加速成分を運動ベクタに累積加算
         MotionX += RelativeX * divisor;
         MotionY += RelativeY * divisor;
 
-        // �^���x�N�^���g���Ĉړ�
+        // 運動ベクタを使って移動
         x += MotionX;
         y += MotionY;
 
-        // �{�[���̉^���x�N�^������������
+        // ボールの運動ベクタを減衰させる
         MotionX *= decay;
         MotionY *= decay;
 
 
 
-        //##### �������� �������̂̏���
-        // �}�E�X���W�̎擾
+        //##### ここから 中央物体の処理
+        // マウス座標の取得
         GetMousePoint(&mouseX, &mouseY);
 
-        // �}�E�X�N���b�N�Œ��S���̂̍��W�ƐF��ύX
+        // マウスクリックで中心物体の座標と色を変更
         if ((GetMouseInput() & MOUSE_INPUT_LEFT) != 0) {
             subColor = GetColor(0, 255, 0);
-            centerX = mouseX - sizeCenter; // �}�E�X���W�͍��オ���_�Ȃ̂ŁA���S���W�ɍ��킹�邽�߂ɐ}�`��2����1��������
+            centerX = mouseX - sizeCenter; // マウス座標は左上が原点なので、中心座標に合わせるために図形の2分の1だけ引く
             centerY = mouseY - sizeCenter;
         }
         else {
             subColor = GetColor(255, 0, 0);
         }
 
-        // �L�[�ňړ�������
+        // キーで移動させる
         int input = GetJoypadInputState(DX_INPUT_KEY_PAD1);
         if (input & PAD_INPUT_RIGHT) {
             centerX += moveSpeed;
@@ -127,7 +126,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             centerY += moveSpeed;
         }
 
-        // ���S���͉̂𑜓x�O�ɏo���Ȃ�
+        // 中心物体は解像度外に出さない
         if (centerX < 0) {
 			centerX = 0;
 		}
@@ -143,28 +142,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 
-        //##### �������� �`�揈��
-        // �l�p��`�� DrawBox(����X���W, ����Y���W, �E��X���W, �E��Y���W, �F, �h��Ԃ��t���O)
+        //##### ここから 描画処理
+        // 四角を描画 DrawBox(左上X座標, 左上Y座標, 右下X座標, 右下Y座標, 色, 塗りつぶしフラグ)
 
-        // �j��\�ȃI�u�W�F�N�g���܂�1�����p�ӁB
-        // �ړ����̂Ɠ���̈ʒu�ɐݒu���ꂽ�I�u�W�F�N�g���G�ꂽ��F��ς���
+        // 破壊可能なオブジェクトをまず1つだけ用意。
+        // 移動物体と特定の位置に設置されたオブジェクトが触れたら色を変える
         if (x + size > objX && x < objX + (size * 3) && y + size > objY && y < objY + (size * 3)) obj = true;
         if (!obj) DrawBox(objX, objY, objX + (size * 3), objY + (size * 3), GetColor(255, 255, 255), TRUE);
 
-        // ���S���̕`��
+        // 中心物体描画
         DrawBox(centerX, centerY, centerX + size, centerY + size, subColor, TRUE);
-        // �ړ����̕`��
+        // 移動物体描画
         DrawBox(x, y, x + size, y + size, mainColor, TRUE);
-        // ���̂̒��S�ƒ��S����Ō���
+        // 物体の中心と中心を線で結ぶ
         DrawLine(x + sizeCenter, y + sizeCenter, centerX + sizeCenter, centerY + sizeCenter, GetColor(255, 255, 255));
 
-        // �f�o�b�O�p
+        // デバッグ用
         printfDx("x:%d y:%d\n", x, y);
         printfDx("centerX:%d centerY:%d\n", centerX, centerY);
         printfDx("RelativeX:%d RelativeY:%d\n", RelativeX, RelativeY);
         printfDx("MotionX:%f MotionY:%f\n", MotionX, MotionY);
 
-        // ��ʂ̍X�V�i�K�{�j
+        // 画面の更新（必須）
         ScreenFlip();
         clsDx();
     }
