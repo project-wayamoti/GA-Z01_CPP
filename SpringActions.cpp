@@ -25,7 +25,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // 減衰値
     // ※液晶のフレームレートによって変化することがわかっているため
     // 動きが早すぎる場合やおそすぎる場合はこの数値を調整すること。
-    float decay = 0.97;
+    float decay = 60 = 0.97; // 60=0.97 300=0.9925 or 0.99
 
     // キー入力時の移動速度
     int moveSpeed = 15;
@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // 除法数値
     // ※液晶のフレームレートによって変化することがわかっているため
     // 動きが早すぎる場合やおそすぎる場合はこの数値を調整すること。
-    float divisor = 0.25;
+    float divisor = 0.25; // 60=0.25 300=0.01
 
 
 
@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     int objX = 100;
     int objY = 400;
 
-    
+
 
     // メインループ（描画処理）
     while (ProcessMessage() == 0) {
@@ -127,17 +127,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         // 中心物体は解像度外に出さない
         if (centerX < 0) {
-			centerX = 0;
-		}
+            centerX = 0;
+        }
         if (centerX > width - size) {
             centerX = width - size;
         }
         if (centerY < 0) {
-			centerY = 0;
-		}
+            centerY = 0;
+        }
         if (centerY > height - size) {
-			centerY = height - size;
-		}
+            centerY = height - size;
+        }
 
 
 
