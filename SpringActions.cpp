@@ -25,7 +25,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // 減衰値
     // ※液晶のフレームレートによって変化することがわかっているため
     // 動きが早すぎる場合やおそすぎる場合はこの数値を調整すること。
-    float decay = 60 = 0.97; // 60=0.97 300=0.9925 or 0.99
+    float decay = 0.97; // 60=0.97 300=0.9925 or 0.99
 
     // キー入力時の移動速度
     int moveSpeed = 15;
